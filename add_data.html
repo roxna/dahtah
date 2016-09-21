@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html >
+  <head>
+    <meta charset="UTF-8">
+    <title>[ADMIN] - Add data</title>
+
+    <!-- Common files loaded upfront across pages -->
+    <link rel="import" href="components/component-head.html" >
+
+  </head>
+
+  <body id="private_container">
+    <section class="container">    	
+	    <article class="">
+            <a href="/">Index page</a>
+            <div class="errorNotification notification"></div>
+            <div class="successNotification notification"></div>
+			<div class="subheader">Add User Info</div>
+    		<div class="data-input">
+        		<input type="email" name="email" id="txtUserEmail" class="inpt" required="required" placeholder="Email">
+                <input type="password" name="password" id="txtUserPassword" class="inpt" required="required" placeholder="Password">
+        		<input type="text" name="username" id="txtUserName" class="inpt" required="required" placeholder="User Name">       
+                <select name="type" id="txtUserType" name="Type">
+                    <option value="admin">Admin</option>
+                    <option value="pharmacy-employee">Pharmacy Employee</option>
+                    <option value="pharmacy-manager">Pharmacy Manager</option>
+                    <!-- <option value="pharma">Pharma Co.</option> -->
+                </select>
+                <input type="text" name="firstname" id="txtUserFName" class="inpt" required="required" placeholder="User First Name">            	
+                <input type="text" name="lastname" id="txtUserLName" class="inpt" required="required" placeholder="User Last Name">
+            	<input type="text" id="txtUserPharmacy" placeholder="Pharmacy Name" class="inpt" list="pharmacy-name" />
+				<datalist id="pharmacy-name"><!-- Inserted dynamically from firebase.js --></datalist>
+            </div>
+            <input type="submit" id="btnAddUser" value="Add User Info" class="submit">
+
+
+    		<div class="subheader">Add Pharmacy Info</div>
+    		<div class="data-input">
+        		<input type="text" name="pharmacyName" id="txtPharmacyName" class="inpt" required placeholder="Name">
+        		<input type="text" name="pharmacyAdd1" id="txtPharmacyAdd1" class="inpt" required placeholder="Address Line 1">
+        		<input type="text" name="pharmacyAdd2" id="txtPharmacyAdd2" class="inpt" required placeholder="Address Line 2">
+        		<select name="pharmacyCity" id="txtPharmacyCity" name="City">
+			      	<option value="bangalore">Bangalore</option>
+			      	<option value="pune">Pune</option>
+			      	<option value="mumbai">Mumbai</option>
+			    </select>
+        		<input type="text" name="pharmacyZip" id="txtPharmacyZip" class="inpt" required="required" placeholder="Zip">
+        		<!-- <input type="text" name="pharmacyCountry" id="txtPharmacyCountry" class="inpt" required="required" placeholder="Country"> -->
+        		<input type="email" name="pharmacyEmail" id="txtPharmacyEmail" class="inpt" required="required" placeholder="Email">
+        		<input type="number" name="pharmacyPhone" id="txtPharmacyPhone" class="inpt" required="required" placeholder="Phone Number">	                
+            </div>
+            <input type="submit" id="btnAddPharmacy" value="Add Pharmacy" class="submit">
+            
+    		<div class="subheader">Add Doctor Info</div>
+    		<div class="data-input">
+        		<input type="text" name="doctorFName" id="txtDoctorFName" class="inpt" required placeholder="First Name">
+        		<input type="text" name="doctorLName" id="txtDoctorLName" class="inpt" required placeholder="Last Name">
+        		<input list="txtDoctorSpecialization" name = "doctorSpecialization" placeholder="Specialization">
+                <datalist id="txtDoctorSpecialization"><!-- Populated from firebase.js --></datalist>
+        		<input type="text" name="doctorAdd1" id="txtDoctorAdd1" class="inpt" required placeholder="Address Line 1">
+        		<input type="text" name="doctorAdd2" id="txtDoctorAdd2" class="inpt" required placeholder="Address Line 2">	        
+			    <select name="doctorCity" id="txtDoctorCity">
+			    	<option value="select">City</option>
+			      	<option value="bangalore">Bangalore</option>
+			      	<option value="pune">Pune</option>
+			      	<option value="mumbai">Mumbai</option>
+			    </select>
+        		<input type="text" name="doctorZip" id="txtDoctorZip" class="inpt" required placeholder="Zip">
+        		<!-- <input type="text" name="doctorCountry" id="txtDoctorCountry" class="inpt" required placeholder="Country"> -->
+        		<input type="email" name="doctorEmail" id="txtDoctorEmail" class="inpt" required placeholder="Email">
+        		<input type="number" name="doctorPhone" id="txtDoctorPhone" class="inpt" required placeholder="Phone Number">	                
+            </div>
+            <input type="submit" id="btnAddDoctor" value="Add Doctor Info" class="submit">
+
+            <div class="subheader">Upload Medication CSV</div>
+            <div class="data-input">
+                <input type="file" id="medicationFileInput" name="Medication Upload" accept=".csv" />
+            </div>       
+
+	    </article>
+	</section>
+   
+    <!-- Common js files loaded across pages -->
+    <link rel="import" href="components/component-foot.html">    
+    <script type="text/javascript" src="js/custom/add-data.js"></script>
+    <script type="text/javascript" src="scripts/medication-upload.js"></script>
+    
+  </body>
+</html>
