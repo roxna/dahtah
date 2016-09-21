@@ -16,7 +16,7 @@ $(document).ready(function() {
   });
 
 
-  var updateMedicationDropdown = function(){
+  function updateMedicationDropdown(){
     DATABASE.ref('/medications').on('value', function(snapshot) {
       snapshot.forEach(function(childSnapshot){
         //Update prescription dropdown on 'Add Record' tab
@@ -24,7 +24,7 @@ $(document).ready(function() {
           "<option value='" + childSnapshot.key + "'></option>");
 
         //Update medication dropdown on 'Order Medicine' tab
-        $('#order-name').append(
+        $('#medication-name').append(
           "<option value='" + childSnapshot.key + "'></option>");
       });
     }, function(error){
@@ -163,7 +163,7 @@ $(document).ready(function() {
       commonData[recordKey] = timestamp;
 
       updateUserDoctorPharmacyRecords(encodeKey(userEmail), doctor, commonData);
-      updateMedicationRecords(medications, commonData, doctor);
+      updateMedicationList(medications, commonData, 'records');
 
       showSuccessNotification("Record added", false);
       clearAddRecordFields();
@@ -183,17 +183,6 @@ $(document).ready(function() {
       DATABASE.ref().child('pharmacies/'+pharmacy+'/records').update(commonData);
     });    
 
-  }
-
-  function updateMedicationRecords(medications, commonData, doctor){
-    for (var i = 0; i < medications.length; i++){
-      // Set MEDICATIONS.records & MEDICATIONS.doctors.prescCount
-      DATABASE.ref('/medications/' + medications[i] + '/records/').update(commonData);
-      var prescRef = DATABASE.ref('/medications/' + medications[i] + '/doctors/' + doctor);
-      prescRef.transaction(function(prescCount){
-        prescCount ? prescCount++ : prescCount=1;
-      });
-    }
   }
 
   function clearAddRecordFields(){
@@ -231,21 +220,17 @@ $(document).ready(function() {
     var medications = [];
     var details = [];
 
-    for (i=0; i<$('.medication-order input').length; i++){          
-        var medication_name = $('.medication-order[data-id='+(i+1)+'] input[name="medication-name"]').val();
-        var medication_detail = $('.medication-order[data-id='+(i+1)+'] input[name="medication-details"]').val();
+    for (i=0; i<($('.medication input').length/2); i++){          
+        var medication_name = $('.medication[data-id='+(i+1)+'] input[name="medication-name"]').val();
+        var medication_detail = $('.medication[data-id='+(i+1)+'] input[name="medication-details"]').val();
         if (medication_name == "" || medication_detail == ""){
+          console.log(i, medication_name, medication_detail);
           showErrorNotification("Please fill in all the fields");
         }else{
           medications[i] = medication_name;
           details[i] = medication_detail;
         }
     };    
-
-    if(medications.length==0 || details.length==0){
-      showErrorNotification("Please fill in all the fields");
-      return;
-    }
 
     if(checkValidMedications(medications, 'Order')){
       updateOrder(medications, details);
@@ -254,7 +239,7 @@ $(document).ready(function() {
 
 
   function updateOrder(medications, details){
-    console.log('in update order');
+    console.log(medications, details);
     try{
       var userEmail = firebase.auth().currentUser.email;
       var timestamp = firebase.database.ServerValue.TIMESTAMP;
@@ -264,17 +249,19 @@ $(document).ready(function() {
       };
 
       for (var i = 0; i < medications.length; i++){
-        if (medications[i] != ""){
-          orderData['medication'+(i+1)] = medications[i] + "/" + details[i];
-        }
+        orderData['medication'+(i+1)] = medications[i] + " - [" + details[i] + "]";
       }
       
       var orderKey = DATABASE.ref().child('orders').push(orderData).key;
 
       var commonData = {};      
+      
       commonData[orderKey] = timestamp;
-      updatePharmacyOrder(encodeKey(userEmail), commonData);
+      updateMedicationList(medications, commonData, 'orders');
 
+      // orderData['orderKey'] = orderKey;
+      updatePharmacyOrder(encodeKey(userEmail), commonData);
+      
       showSuccessNotification("Order added", false);
       clearAddOrderFields();
     }catch(error){    
@@ -282,12 +269,11 @@ $(document).ready(function() {
     }
   }
 
-  function updatePharmacyOrder(userEmailEncoded, commonData){
-    // Get pharmacy of user and add record to pharmacy list
+  function updatePharmacyOrder(userEmailEncoded, data){
     var pharmacy;
     DATABASE.ref('/users/'+userEmailEncoded).once('value').then(function(snapshot){
       pharmacy = snapshot.val().pharmacy;
-      DATABASE.ref().child('pharmacies/'+pharmacy+'/orders').update(commonData);
+      DATABASE.ref().child('pharmacies/'+pharmacy+'/orders').update(data);
     });    
   };
 
@@ -304,20 +290,18 @@ $(document).ready(function() {
 
   var orderCount = 2;
   $('#btnAnotherOrder').click(function(){
-    $('#order-name').html(''); //Resets the datalist so there aren't duplicates
+    $('#medication-name').html(''); //Resets the datalist so there aren't duplicates
     $('.medication-group').append(
-      '<div class="medication-order" data-id='+orderCount+'>' +                
+      '<div class="medication" data-id='+orderCount+'>' +                
           '<div>Medication: ' +
               '<input type="text" name="medication-name" list="medication-name" placeholder="Name"/>' +
-              '<datalist id="order-name"></datalist>' +
+              '<datalist id="medication-name"></datalist>' +
               '<input type="text" name="medication-details" list="medication-details" placeholder="Details (quantity, dosage etc)"/>'+
           '</div>' +
         '</div>');
     orderCount++;
     updateMedicationDropdown(); //Adds the datalist into the dropdown
-    console.log(orderCount);
   });
-
 
   /*-----------------------------------------------------------------------
   MANAGE DATALIST ENTRIES
@@ -350,11 +334,23 @@ $(document).ready(function() {
           showErrorNotification('Please enter a correct medication name');
           return false;
         }
-      }
-      return true;
-    });    
+      }      
+    });
+    return true;    
   }
 
+  function updateMedicationList(medications, commonData, recordOrOrder){
+    for (var i = 0; i < medications.length; i++){
+      // Set MEDICATIONS.records
+      DATABASE.ref('/medications/' + medications[i] + '/' + recordOrOrder).update(commonData);
+
+      //TODO: Set MEDICATIONS.doctors.prescCount
+      // var prescRef = DATABASE.ref('/medications/' + medications[i] + '/doctors/' + doctor);
+      // prescRef.transaction(function(prescCount){
+      //   prescCount ? prescCount++ : prescCount=1;
+      // });
+    }
+  }
 
 
 });
