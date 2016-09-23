@@ -1,18 +1,13 @@
 <!DOCTYPE html>
 <html >
   <head>
-    <!-- Common files loaded upfront across pages -->
-	<script type="text/javascript" src='../js/jquery/jquery.min.js'></script>
-    <script> 
-     $("head").load("components/header.html", function(){
-     	$("head").append(
-     		'<link rel="stylesheet" href="css/font-awesome-4.6.3/css/font-awesome.min.css">'
-     		);
-     });
-   </script>
+  	<title>Pharma Dahtah</title>
+
+    <!-- Common files loaded upfront across pages -->	
+	<link rel="import" href="components/header.html" >
 
     <!-- <link rel="stylesheet" href="js/morris.js-0.5.1/morris.css"> -->
-    <!-- <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">  -->
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet"> 
     
 
   </head>
@@ -44,19 +39,6 @@
                         <a href="#" class="more">Terms and conditions</a> -->
                     </div>
 		        </div>
-				<!-- <div class="signup-cont cont">
-                    <input type="text" name="name" id="txtName" class="inpt" required="required" placeholder="Name">
-                	<input type="email" name="email" id="txtEmail" class="inpt" required="required" placeholder="Email">
-                    <input type="password" name="password" id="txtPassword" class="inpt" required="required" placeholder="Password">
-                	<input type="text" placeholder="Pharmacy Name" class="inpt" list="pharmacy-name" />
-					<datalist id="pharmacy-name"> -->
-						<!-- Inserted dynamically from firebase.js
-					</datalist>
-                    <div class="submit-wrap">
-	                        <input type="submit" id="btnSignup" value="Sign up" class="submit">
-	                        <a href="#" class="more">Terms and conditions</a>
-                    </div>
-                </div> -->
         	</div>	
         	<div class="content authenticated">        
             	<div class="dashboard-cont cont">

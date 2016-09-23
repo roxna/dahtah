@@ -11,7 +11,6 @@ $(document).ready(function() {
     snapshot.forEach(function(childSnapshot){
       $('#pharmacy-name').append(
         "<option value='" + childSnapshot.val().name + "'></option>");
-      // "<option data-key='" + childSnapshot.key + "' value='" + childSnapshot.val().name + "'>" + childSnapshot.val().name + "</option>");
       })      
   }, function(error){
     console.log(error);
@@ -26,22 +25,26 @@ $(document).ready(function() {
     );
   }
 
-  /******
+  /*-----------------------------------------------------------------------
   MANAGE AUTH STATE
-  *******/
+  -----------------------------------------------------------------------*/
   firebase.auth().onAuthStateChanged(function(user) {
     var userType;
-    DATABASE.ref('/users/'+encodeKey(user.email)).once('value').then(function(snapshot){
-      userType = snapshot.val().type;
-    }).then(function(){
-      if (userType == "admin") {
-        $('#private_container').show();
-      } else {
-        showErrorNotification('Bummer. You can not access this page');
-        $('#private_container').hide();
-        window.location.href = "index.html";
-      }
-    })
+    try{
+      DATABASE.ref('/users/'+encodeKey(user.email)).once('value').then(function(snapshot){
+        userType = snapshot.val().type;        
+      }).then(function(){
+        if (userType == "admin") {
+          $('#private_container').show();
+        } else {
+          showErrorNotification('Bummer. You can not access this page');
+          $('#private_container').hide();
+          window.location.href = "index.html";
+        }
+      })
+    }catch(error){
+      showErrorNotification("Unable to get user information");
+    }
   });
 
   
@@ -66,8 +69,8 @@ $(document).ready(function() {
   });
 
   function getValues(email, password, username, type, first_name, last_name, pharmacy, callback){
-    if(type == "admin"){
-      pharmacy = 'n/a';
+    if(type == "Admin"){
+      pharmacy = "n/a";
       if (typeof(callback) === "function") {
         callback(email, password, username, type, first_name, last_name, pharmacy, zip);
       }
@@ -122,7 +125,7 @@ $(document).ready(function() {
     };
     var userEmailEncoded = encodeKey(email);
     console.log(userEmailEncoded, userData);
-    DATABASE.ref('/users/' + userEmailEncoded).set(userData);
+    DATABASE.ref('/users/' + userEmailEncoded).update(userData);
   }
 
 

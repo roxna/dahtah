@@ -25,7 +25,7 @@ $(document).ready(function() {
 
     function getInfoDrawCharts(userEmailEncoded){
         DATABASE.ref('/users/'+userEmailEncoded+'/records').once('value').then(function(snapshot) {
-            console.log(snapshot.val());
+            // console.log(snapshot.val());
             records_month_done = snapshot.numChildren();        
             wklyCount = getWeeklyCount(snapshot);
             return [records_month_done, wklyCount];
@@ -38,7 +38,7 @@ $(document).ready(function() {
     }
 
     function getWeeklyCount(snapshot){
-        console.log(snapshot.val());
+        // console.log(snapshot.val());
         wklyCount = {
             'wk1': 0,
             'wk2': 0,
