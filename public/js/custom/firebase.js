@@ -1,6 +1,6 @@
 $(document).ready(function() {
   
-  var DATABASE = firebase.database();  
+  var DATABASE = firebase.database();
   
   /*-----------------------------------------------------------------------
   FIREBASE PULL DATA / SET UP DATA LISTS
@@ -8,6 +8,7 @@ $(document).ready(function() {
 
   DATABASE.ref('/doctors').on('value', function(snapshot) {
     snapshot.forEach(function(childSnapshot){
+      DOCTOR_LIST[childSnapshot.key] = true;
       $('#doctor-name').append(
         "<option value='" + childSnapshot.val().fname + " " + childSnapshot.val().lname + "'></option>");
     });
@@ -15,10 +16,17 @@ $(document).ready(function() {
     console.log(error);
   });
 
+  DATABASE.ref('/medications').on('value', function(snapshot) {
+    snapshot.forEach(function(childSnapshot){
+      //Hold a list of medications 
+      MEDICATION_LIST[childSnapshot.key] = true;
+    })
+  });
 
   function updateMedicationDropdown(){
     DATABASE.ref('/medications').on('value', function(snapshot) {
       snapshot.forEach(function(childSnapshot){
+
         //Update prescription dropdown on 'Add Record' tab
         $('#prescription-name').append(
           "<option value='" + childSnapshot.key + "'></option>");
@@ -48,6 +56,13 @@ $(document).ready(function() {
       $('#txtPassword').val('');
     });
   });
+
+  // Sign In on "Enter"
+  $('#txtPassword').keypress(function(e){
+        if(e.which == 13){
+          $('#btnSignin').click();
+        }
+    });
 
   $('#btnSignout').click(function(){
     if (firebase.auth().currentUser) {
@@ -90,9 +105,9 @@ $(document).ready(function() {
   var showSignedInPortal = function(){
     $('.unauthenticated').hide();
     $('.authenticated').show();
-    $('.record').addClass('active');
+    $('.dashboard').addClass('active');
     $('.cont').hide();   
-    $('.record-cont').show();
+    $('.dashboard-cont').show();
   }
 
   var showSignedOutPortal = function(){
@@ -126,9 +141,8 @@ $(document).ready(function() {
     }
 
     if(checkValidDoctor(doctor) && checkValidMedications(medications, 'Record')){
-      console.log(checkValidMedications(medications, 'Record'));
       updateRecords(gender, age, doctor, medications);
-    }
+    } 
   });
 
   // Reset border color when user changes input on a wrong cell
@@ -213,6 +227,7 @@ $(document).ready(function() {
     updateMedicationDropdown(); //Adds the datalist into the dropdown
   });
 
+
   /*-----------------------------------------------------------------------
   MANAGE ADD ORDER BUTTON
   -----------------------------------------------------------------------*/
@@ -232,6 +247,7 @@ $(document).ready(function() {
         }
     };    
 
+    // NEED TO MAKE THIS A CALLBACK FUNCTION
     if(checkValidMedications(medications, 'Order')){
       updateOrder(medications, details);
     }
@@ -271,10 +287,14 @@ $(document).ready(function() {
 
   function updatePharmacyOrder(userEmailEncoded, data){
     var pharmacy;
-    DATABASE.ref('/users/'+userEmailEncoded).once('value').then(function(snapshot){
+    try{
+      DATABASE.ref('/users/'+userEmailEncoded).once('value').then(function(snapshot){
       pharmacy = snapshot.val().pharmacy;
       DATABASE.ref().child('pharmacies/'+pharmacy+'/orders').update(data);
-    });    
+    });
+    }catch(error){
+      showErrorNotification(error.message);
+    }    
   };
 
   function clearAddOrderFields(){
@@ -303,41 +323,64 @@ $(document).ready(function() {
     updateMedicationDropdown(); //Adds the datalist into the dropdown
   });
 
+
   /*-----------------------------------------------------------------------
   MANAGE DATALIST ENTRIES
   // Datalists provide suggestions but don't force a specific selection. 
-  // Need to ensure the user's input is a doctor/medication in the database (vs. a random typo)
-  -----------------------------------------------------------------------*/
-  
-  //TODO
+  // Functions below are to ensure the user's input is a doctor/medication in the database (vs. a random typo)
+  -----------------------------------------------------------------------*/ 
+
   function checkValidDoctor(doctor){
-    // DATABASE.ref().child('doctors/'+userEmailEncoded+'/records/').update(commonData);
+    if(!(doctor in DOCTOR_LIST)){
+      showErrorNotification('Please enter a correct doctor name from the dropdown list.');
+      return false;
+    }
     return true;
   }
 
-  function checkValidMedications(medications, recordOrOrder){
-    DATABASE.ref('/medications/').once('value').then(function(snapshot){
-      console.log(snapshot);
-      console.log(snapshot.val());
-      console.log(snapshot.child);
+  console.log(MEDICATION_LIST);
+  function checkValidMedications(medications, recordOrOrder, callback){
+    console.log(medications);
+    console.log(MEDICATION_LIST);
       for (i=0; i<medications.length; i++){
-        if(!snapshot.hasChild(medications[i])){
+        if(!(medications[i] in MEDICATION_LIST)){
+          console.log(medications[i]);
           if(recordOrOrder == 'Record'){
             $('.prescription[data-id='+(i+1)+'] input').css('border-color', 'red'); //incorrect entry          
-          }
-          else if(recordOrOrder == 'Order'){
-            $('.medication-order[data-id='+(i+1)+'] input').css('border-color', 'red'); //incorrect entry          
-          }
-          else{
+          }else if(recordOrOrder == 'Order'){
+            $('.medication[data-id='+(i+1)+'] input').css('border-color', 'red'); //incorrect entry          
+          }else{
             console.log('Invalid input - record or order');
           }
-          showErrorNotification('Please enter a correct medication name');
+          showErrorNotification('Please enter a correct medication name from the dropdown list.');
           return false;
         }
-      }      
-    });
-    return true;    
+      }
+     return true;
   }
+
+  // function checkValidMedications(medications, recordOrOrder, callback){
+  //   DATABASE.ref('/medications/').once('value').then(function(snapshot){
+  //     for (i=0; i<medications.length; i++){
+  //       if(!snapshot.hasChild(medications[i])){
+  //         if(recordOrOrder == 'Record'){
+  //           $('.prescription[data-id='+(i+1)+'] input').css('border-color', 'red'); //incorrect entry          
+  //         }else if(recordOrOrder == 'Order'){
+  //           $('.medication-order[data-id='+(i+1)+'] input').css('border-color', 'red'); //incorrect entry          
+  //         }else{
+  //           console.log('Invalid input - record or order');
+  //         }
+  //         showErrorNotification('Please enter a correct medication name');
+  //         return false;
+  //       }
+  //     }
+  //    return true;   
+  //   }).then(function(){
+  //       if (typeof(callback) === "function") {
+  //         callback(gender, age, doctor, medications);
+  //       }
+  //   });
+  // }
 
   function updateMedicationList(medications, commonData, recordOrOrder){
     for (var i = 0; i < medications.length; i++){

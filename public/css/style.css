@@ -214,10 +214,12 @@ body .container .content .signup-cont {
   padding: 10px;
 }
 .errorNotification{
-  background: #ff7f7f,
+  background-color: #ff7f7f;
+  display: none;
 }
 .successNotification{
-  background: #BCED91,
+  background-color: #BCED91;
+  display: none;
 }
 .record-cont{
   /*width: 100%;

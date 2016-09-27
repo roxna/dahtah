@@ -13,9 +13,18 @@
 	<!-- SHARED FUNCTIONS -->
 	<script> 
 
-	window.onbeforeunload = function() {
-	  return "Data will be lost if you leave the page. Are you sure?";
-	};
+	// Alert on page reload
+	// window.onbeforeunload = function() {
+	//   return "Data will be lost if you leave the page. Are you sure?";
+	// };
+
+  	var SPECIALIZATION_LIST = ['Anaesthesia', 'Dermatology', 'Emergency medicine', 'General practice',
+						  	'Intensive care', 'OBGyn', 'Opthalmology', 'Pediatrics', 'Pathology', 'Psychiatry', 
+						  	'Radiation oncology','Radiology', 'Sexual health medicine', 'Surgery', "n/a"];	
+	var DOCTOR_LIST = {};
+  	var MEDICATION_LIST = {};
+  	var PHARMACY_LIST = {}; //User on add_data.html page
+
 
 	var encodeKey = function (str) { 
   		return str.split('.').join('%2E').split('@').join('%AT%');
@@ -27,10 +36,12 @@
 	}
 
 	var showErrorNotification = function(errorMessage){
+	  $('.errorNotification').show().delay(3000).fadeOut();
 	  $('.errorNotification').text(errorMessage).show().delay(3000).fadeOut();
 	  console.log(errorMessage);
 	}
 	var showSuccessNotification = function(topic, clearChildInputs){
+	  $('.successNotification').show().delay(3000).fadeOut();
 	  $('.successNotification').text(topic + ' successfully').show().delay(3000).fadeOut();
 	  if(clearChildInputs) $('.data-input').children().val(''); 
 	}

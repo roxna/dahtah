@@ -32,10 +32,12 @@ $(document).ready(function() {
 });
 
 /* TODO
-- Is Rx delivered or user bought something else?
+
+- (v2) Is Rx delivered or user bought something else?
 - updateMedicationRecords - MEDICATIONS.doctors.prescCount(firebase.js) doesnt work
-- index page - error check if datalist is a random text input vs part of dropdown, also add-Html (eg. specializations)
 - Dashboard to see if irregular pharma input behavior
-- Dashboard for pharma to view (pharma-admin specific)
+- (v3) Dashboard for pharma to view (pharma-admin specific)
 - AddUserToPharmacy needs to be called on page load - extract it from the function
+
+
 */

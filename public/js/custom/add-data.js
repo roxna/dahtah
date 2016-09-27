@@ -9,6 +9,7 @@ $(document).ready(function() {
  // Populates the datalist on 'Add Record' and 'Add User' (admin) with PHARMACY names
   DATABASE.ref('/pharmacies').once('value').then(function(snapshot) {    
     snapshot.forEach(function(childSnapshot){
+      PHARMACY_LIST[childSnapshot] = true;
       $('#pharmacy-name').append(
         "<option value='" + childSnapshot.val().name + "'></option>");
       })      
@@ -16,12 +17,9 @@ $(document).ready(function() {
     console.log(error);
   });
 
-  var specializations = ['Anaesthesia', 'Dermatology', 'Emergency medicine', 'General practice',
-  'Intensive care', 'OBGyn', 'Opthalmology', 'Pediatrics', 'Pathology', 'Psychiatry', 'Radiation oncology', 
-  'Radiology', 'Sexual health medicine', 'Surgery'];
-  for (var i=0; i< specializations.length; i++){
+  for (var i=0; i< SPECIALIZATION_LIST.length; i++){
     $('#txtDoctorSpecialization').append(
-        "<option value='" + specializations[i] + "'></option>"
+        "<option value='" + SPECIALIZATION_LIST[i] + "'></option>"
     );
   }
 
@@ -62,6 +60,11 @@ $(document).ready(function() {
     var pharmacy = $('#txtUserPharmacy').val();    
     var zip = "00000";
 
+    if(!(pharmacy in PHARMACY_LIST)){
+      showErrorNotification('Please enter a correct pharmacy name from the dropdown list.');
+      return false;
+    }
+
     if(!checkValidEntries([email, password, username, type, first_name, last_name, pharmacy], email)){
       return;
     }
@@ -75,17 +78,20 @@ $(document).ready(function() {
         callback(email, password, username, type, first_name, last_name, pharmacy, zip);
       }
     }
-
-    else if(type.includes("pharmacy")){      
-      DATABASE.ref('/pharmacies/'+pharmacy).once('value').then(function(snapshot){
-        zip = snapshot.val().zip;      
-      })
-      .then(function(){
-        if (typeof(callback) === "function") {
-          callback(email, password, username, type, first_name, last_name, pharmacy, zip);
-        }
-      });
-    } 
+    else if(type.includes("pharmacy")){
+      try{ 
+        DATABASE.ref('/pharmacies/'+pharmacy).once('value').then(function(snapshot){
+          zip = snapshot.val().zip;      
+        })
+        .then(function(){
+          if (typeof(callback) === "function") {
+            callback(email, password, username, type, first_name, last_name, pharmacy, zip);
+          }
+        })
+      }catch(error){
+          showErrorNotification(error.message);
+      } 
+    }
   }
 
   function addUser(email, password, username, type, first_name, last_name, pharmacy, zip){
@@ -132,23 +138,21 @@ $(document).ready(function() {
   // ADD PHARMACY INFORMATION
   $('#btnAddPharmacy').click(function(){
     var name = $('#txtPharmacyName').val();
-    var address1 = $('#txtPharmacyAdd1').val();
-    var address2 = $('#txtPharmacyAdd2').val();
+    var address = $('#txtPharmacyAdd').val();
     var city = $('#txtPharmacyCity').val();
     var zip = $('#txtPharmacyZip').val();
     var country = $('#txtPharmacyCountry').val() ? null : "India";
     var email = $('#txtPharmacyEmail').val();
     var phone = $('#txtPharmacyPhone').val();
 
-    if(!checkValidEntries([name, address1, address2, city, zip, country, email, phone], email)){
+    if(!checkValidEntries([name, address, city, zip, country, email, phone], email)){
       return;
     }
 
     try{
       var pharmacyData = {
         name: name, 
-        address1: address1,
-        address2: address2,
+        address: address,
         city: city,
         zip: zip,
         country: country,
@@ -185,16 +189,20 @@ $(document).ready(function() {
     var fname = $('#txtDoctorFName').val();
     var lname = $('#txtDoctorLName').val();
     var specialization = $("input[name=doctorSpecialization]").val();
-    var address1 = $('#txtDoctorAdd1').val();
-    var address2 = $('#txtDoctorAdd2').val();
+    var address = $('#txtDoctorAdd').val();
     var city = $('#txtDoctorCity').val();
     var zip = $('#txtDoctorZip').val();
     var country = $('#txtDoctorCountry').val() ? null : "India";
     var email = $('#txtDoctorEmail').val();
     var phone = $('#txtDoctorPhone').val();
 
-    if(!checkValidEntries([fname, lname, specialization, address1, address2, city, zip, country, email, phone], email)){
-      return;
+    if(!(specialization in SPECIALIZATION_LIST)){
+      showErrorNotification('Please enter a specialization from the dropdown list.');
+      return false;
+    }
+
+    if(!checkValidEntries([fname, lname, specialization, address, city, zip, country, email, phone], email)){
+      return false;
     }
 
     try{
@@ -202,8 +210,7 @@ $(document).ready(function() {
         fname: fname,
         lname: lname,
         specialization: specialization,
-        address1: address1,
-        address2: address2,    
+        address: address, 
         city: city,
         zip: zip,
         country: country,

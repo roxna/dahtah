@@ -37,12 +37,12 @@
             <div class="subheader">Add Pharmacy Info</div>
             <div class="data-input">
                 <input type="text" name="pharmacyName" id="txtPharmacyName" class="inpt" required placeholder="Name">
-                <input type="text" name="pharmacyAdd1" id="txtPharmacyAdd1" class="inpt" required placeholder="Address Line 1">
-                <input type="text" name="pharmacyAdd2" id="txtPharmacyAdd2" class="inpt" required placeholder="Address Line 2">
+                <input type="text" name="pharmacyAdd" id="txtPharmacyAdd" class="inpt" required placeholder="Address">
                 <select name="pharmacyCity" id="txtPharmacyCity" name="City">
+                    <option value="select">City</option>
                     <option value="bangalore">Bangalore</option>
                     <option value="pune">Pune</option>
-                    <option value="mumbai">Mumbai</option>
+                    <option value="n/a">Mumbai</option>                    
                 </select>
                 <input type="text" name="pharmacyZip" id="txtPharmacyZip" class="inpt" required="required" placeholder="Zip">
                 <!-- <input type="text" name="pharmacyCountry" id="txtPharmacyCountry" class="inpt" required="required" placeholder="Country"> -->
@@ -57,13 +57,13 @@
                 <input type="text" name="doctorLName" id="txtDoctorLName" class="inpt" required placeholder="Last Name">
                 <input list="txtDoctorSpecialization" name = "doctorSpecialization" placeholder="Specialization">
                 <datalist id="txtDoctorSpecialization"><!-- Populated from firebase.js --></datalist>
-                <input type="text" name="doctorAdd1" id="txtDoctorAdd1" class="inpt" required placeholder="Address Line 1">
-                <input type="text" name="doctorAdd2" id="txtDoctorAdd2" class="inpt" required placeholder="Address Line 2">         
+                <input type="text" name="doctorAdd" id="txtDoctorAdd" class="inpt" required placeholder="Address">      
                 <select name="doctorCity" id="txtDoctorCity">
                     <option value="select">City</option>
                     <option value="bangalore">Bangalore</option>
                     <option value="pune">Pune</option>
                     <option value="mumbai">Mumbai</option>
+                    <option value="n/a">n/a</option>
                 </select>
                 <input type="text" name="doctorZip" id="txtDoctorZip" class="inpt" required placeholder="Zip">
                 <!-- <input type="text" name="doctorCountry" id="txtDoctorCountry" class="inpt" required placeholder="Country"> -->
