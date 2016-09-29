@@ -127,19 +127,28 @@ $(document).ready(function() {
     var age = $("input[name='age']:checked").val();
     var doctor = $('input[name=doctor-name]').val();
     var prescriptions = [];
+    var disease = $("input[name='disease']:checked").val();   
     
     for (i=0; i<$('.prescription input[name=prescription-name]').length; i++){          
         prescriptions[i] = $('.prescription[data-id='+(i+1)+'] input').val();
     };    
 
-    if(!gender|| !age || !doctor || prescriptions.length==0){
+    // Check to see either Patient Info AN (Rx Info OR Disease Info) is filled
+    if(!(gender && age && ((doctor && prescriptions.length>0) || (disease)))){
       showErrorNotification("Please fill in all the fields");
       return;
     }
 
-    if(checkValidDoctor(doctor) && checkValidMedications(prescriptions, 'Record')){
-      updateRecords(gender, age, doctor, prescriptions);
-    } 
+    if(doctor){
+      if(checkValidDoctor(doctor) && checkValidMedications(prescriptions, 'Record')){
+        disease === undefined ? '' : disease;
+        updateRecords(gender, age, doctor, prescriptions, disease);
+      }
+    }else{
+      updateRecords(gender, age, 'n/a', 'n/a', disease)
+    }
+
+
   });
 
   // Reset border color when user changes input on a wrong cell
@@ -147,7 +156,7 @@ $(document).ready(function() {
     $(this).css('border-color', 'light-grey');
   });
 
-  function updateRecords(gender, age, doctor, prescriptions){
+  function updateRecords(gender, age, doctor, prescriptions, disease){
     try{
       var userEmail = firebase.auth().currentUser.email;
       var timestamp = firebase.database.ServerValue.TIMESTAMP;
@@ -156,12 +165,15 @@ $(document).ready(function() {
         gender: gender,
         age: age,
         doctor: doctor,
+        disease: disease,
         _updated: timestamp
       };
 
-      for (var i = 0; i < prescriptions.length; i++){
-        if (prescriptions[i] != ""){
-          recordData['medication'+(i+1)] = prescriptions[i];
+      if (prescriptions != "n/a"){
+        for (var i = 0; i < prescriptions.length; i++){
+          if (prescriptions[i] != ""){
+            recordData['medication'+(i+1)] = prescriptions[i];
+          }
         }
       }
       
@@ -175,6 +187,10 @@ $(document).ready(function() {
 
       updateUserDoctorPharmacyRecords(encodeKey(userEmail), doctor, commonData);
       updateMedicationList(prescriptions, commonData, 'records');
+
+      if(disease != ""){
+        DATABASE.ref().child('diseases/'+disease+'/').update(commonData);
+      }
 
       showSuccessNotification("Record added", false);
       clearAddRecordFields();
