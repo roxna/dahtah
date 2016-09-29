@@ -38,6 +38,7 @@
             <div class="data-input">
                 <input type="text" name="pharmacyName" id="txtPharmacyName" class="inpt" required placeholder="Name">
                 <input type="text" name="pharmacyAdd" id="txtPharmacyAdd" class="inpt" required placeholder="Address">
+                <input type="text" name="pharmacyLocality" id="txtPharmacyLocality" class="inpt" required placeholder="Locality">
                 <select name="pharmacyCity" id="txtPharmacyCity" name="City">
                     <option value="select">City</option>
                     <option value="bangalore">Bangalore</option>
@@ -55,9 +56,11 @@
             <div class="data-input">
                 <input type="text" name="doctorFName" id="txtDoctorFName" class="inpt" required placeholder="First Name">
                 <input type="text" name="doctorLName" id="txtDoctorLName" class="inpt" required placeholder="Last Name">
+                <input type="text" name="doctorTitle" id="txtDoctorTitle" class="inpt" required placeholder="Title">
                 <input list="txtDoctorSpecialization" name = "doctorSpecialization" placeholder="Specialization">
-                <datalist id="txtDoctorSpecialization"><!-- Populated from firebase.js --></datalist>
+                <datalist id="txtDoctorSpecialization"><!-- firebase.js --></datalist>
                 <input type="text" name="doctorAdd" id="txtDoctorAdd" class="inpt" required placeholder="Address">      
+                <input type="text" name="doctorLocality" id="txtDoctorLocality" class="inpt" required placeholder="Locality">      
                 <select name="doctorCity" id="txtDoctorCity">
                     <option value="select">City</option>
                     <option value="bangalore">Bangalore</option>

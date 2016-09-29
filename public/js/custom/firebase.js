@@ -126,22 +126,19 @@ $(document).ready(function() {
     var gender = $("input[name='gender']:checked").val();
     var age = $("input[name='age']:checked").val();
     var doctor = $('input[name=doctor-name]').val();
-    var medications = [];
-
-    for (i=0; i<$('.prescription input').length; i++){          
-        medications[i] = $('.prescription[data-id='+(i+1)+'] input').val();
+    var prescriptions = [];
+    
+    for (i=0; i<$('.prescription input[name=prescription-name]').length; i++){          
+        prescriptions[i] = $('.prescription[data-id='+(i+1)+'] input').val();
     };    
-    console.log(gender); // still unknown
-    console.log(medications[0]);
 
-    if(!gender|| !age || !doctor || medications.length==0){
-      console.log(medications.length);
+    if(!gender|| !age || !doctor || prescriptions.length==0){
       showErrorNotification("Please fill in all the fields");
       return;
     }
 
-    if(checkValidDoctor(doctor) && checkValidMedications(medications, 'Record')){
-      updateRecords(gender, age, doctor, medications);
+    if(checkValidDoctor(doctor) && checkValidMedications(prescriptions, 'Record')){
+      updateRecords(gender, age, doctor, prescriptions);
     } 
   });
 
@@ -150,7 +147,7 @@ $(document).ready(function() {
     $(this).css('border-color', 'light-grey');
   });
 
-  function updateRecords(gender, age, doctor, medications){
+  function updateRecords(gender, age, doctor, prescriptions){
     try{
       var userEmail = firebase.auth().currentUser.email;
       var timestamp = firebase.database.ServerValue.TIMESTAMP;
@@ -162,9 +159,9 @@ $(document).ready(function() {
         _updated: timestamp
       };
 
-      for (var i = 0; i < medications.length; i++){
-        if (medications[i] != ""){
-          recordData['medication'+(i+1)] = medications[i];
+      for (var i = 0; i < prescriptions.length; i++){
+        if (prescriptions[i] != ""){
+          recordData['medication'+(i+1)] = prescriptions[i];
         }
       }
       
@@ -177,7 +174,7 @@ $(document).ready(function() {
       commonData[recordKey] = timestamp;
 
       updateUserDoctorPharmacyRecords(encodeKey(userEmail), doctor, commonData);
-      updateMedicationList(medications, commonData, 'records');
+      updateMedicationList(prescriptions, commonData, 'records');
 
       showSuccessNotification("Record added", false);
       clearAddRecordFields();
@@ -206,11 +203,12 @@ $(document).ready(function() {
     $("input[name=prescription-name]").val('');
     $('.prescription-group').html(
       '<div class="prescription" data-id=1>' +                
-          '<div>Medication name:' +
-              '<input type="text" name="prescription-name" list="prescription-name" />' +
+          '<div>Medicine:' +
+              '<input type="text" name="prescription-name" list="prescription-name" class="datalist"/>' +
               '<datalist id="prescription-name"></datalist>' +
           '</div>' +
         '</div>');
+    $("input[name='disease']").prop('checked', false);
   };
 
   var prescriptionCount = 2;
@@ -218,10 +216,12 @@ $(document).ready(function() {
     $('#prescription-name').html(''); //Resets the datalist so there aren't duplicates
     $('.prescription-group').append(
       '<div class="prescription" data-id='+prescriptionCount+'>' +                
-          '<div>Medication name:' +
-              '<input type="text" name="prescription-name" list="prescription-name"/>' +
+          '<div>Medicine:' +
+              '<span class="field-entry">'+
+              '<input type="text" name="prescription-name" list="prescription-name" class="datalist"/>' +
               '<datalist id="prescription-name"></datalist>' +
-          '</div>' +
+              '</span>' +
+          '</div><br>' +
         '</div>');
     prescriptionCount++;
     updateMedicationDropdown(); //Adds the datalist into the dropdown
@@ -300,7 +300,7 @@ $(document).ready(function() {
   function clearAddOrderFields(){
     $('.medication-group').html(
       '<div class="medication-order" data-id=1>' +
-         '<div>Medication:'+
+         '<div>Medicine:'+
             '<input type="text" name="medication-name" list="medication-name" placeholder="Name"/>'+
             '<datalist id="order-name"></datalist>'+
             '<input type="text" name="medication-details" list="medication-details" placeholder="Details (quantity, dosage etc)"/>'+
@@ -313,7 +313,7 @@ $(document).ready(function() {
     $('#medication-name').html(''); //Resets the datalist so there aren't duplicates
     $('.medication-group').append(
       '<div class="medication" data-id='+orderCount+'>' +                
-          '<div>Medication: ' +
+          '<div>Medicine: ' +
               '<input type="text" name="medication-name" list="medication-name" placeholder="Name"/>' +
               '<datalist id="medication-name"></datalist>' +
               '<input type="text" name="medication-details" list="medication-details" placeholder="Details (quantity, dosage etc)"/>'+
@@ -338,10 +338,7 @@ $(document).ready(function() {
     return true;
   }
 
-  console.log(MEDICATION_LIST);
   function checkValidMedications(medications, recordOrOrder, callback){
-    console.log(medications);
-    console.log(MEDICATION_LIST);
       for (i=0; i<medications.length; i++){
         if(!(medications[i] in MEDICATION_LIST)){
           console.log(medications[i]);
@@ -358,29 +355,6 @@ $(document).ready(function() {
       }
      return true;
   }
-
-  // function checkValidMedications(medications, recordOrOrder, callback){
-  //   DATABASE.ref('/medications/').once('value').then(function(snapshot){
-  //     for (i=0; i<medications.length; i++){
-  //       if(!snapshot.hasChild(medications[i])){
-  //         if(recordOrOrder == 'Record'){
-  //           $('.prescription[data-id='+(i+1)+'] input').css('border-color', 'red'); //incorrect entry          
-  //         }else if(recordOrOrder == 'Order'){
-  //           $('.medication-order[data-id='+(i+1)+'] input').css('border-color', 'red'); //incorrect entry          
-  //         }else{
-  //           console.log('Invalid input - record or order');
-  //         }
-  //         showErrorNotification('Please enter a correct medication name');
-  //         return false;
-  //       }
-  //     }
-  //    return true;   
-  //   }).then(function(){
-  //       if (typeof(callback) === "function") {
-  //         callback(gender, age, doctor, medications);
-  //       }
-  //   });
-  // }
 
   function updateMedicationList(medications, commonData, recordOrOrder){
     for (var i = 0; i < medications.length; i++){

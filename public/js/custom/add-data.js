@@ -139,13 +139,14 @@ $(document).ready(function() {
   $('#btnAddPharmacy').click(function(){
     var name = $('#txtPharmacyName').val();
     var address = $('#txtPharmacyAdd').val();
+    var locality = $('#txtPharmacyLocality').val();
     var city = $('#txtPharmacyCity').val();
     var zip = $('#txtPharmacyZip').val();
     var country = $('#txtPharmacyCountry').val() ? null : "India";
     var email = $('#txtPharmacyEmail').val();
     var phone = $('#txtPharmacyPhone').val();
 
-    if(!checkValidEntries([name, address, city, zip, country, email, phone], email)){
+    if(!checkValidEntries([name, address, locality, city, zip, country, email, phone], email)){
       return;
     }
 
@@ -153,6 +154,7 @@ $(document).ready(function() {
       var pharmacyData = {
         name: name, 
         address: address,
+        locality: locality,
         city: city,
         zip: zip,
         country: country,
@@ -188,8 +190,10 @@ $(document).ready(function() {
   $('#btnAddDoctor').click(function(){
     var fname = $('#txtDoctorFName').val();
     var lname = $('#txtDoctorLName').val();
+    var title = $('#txtDoctorTitle').val();
     var specialization = $("input[name=doctorSpecialization]").val();
     var address = $('#txtDoctorAdd').val();
+    var locality = $('#txtDoctorLocality').val();
     var city = $('#txtDoctorCity').val();
     var zip = $('#txtDoctorZip').val();
     var country = $('#txtDoctorCountry').val() ? null : "India";
@@ -201,7 +205,7 @@ $(document).ready(function() {
       return false;
     }
 
-    if(!checkValidEntries([fname, lname, specialization, address, city, zip, country, email, phone], email)){
+    if(!checkValidEntries([fname, lname, title, specialization, address, locality, city, zip, country, email, phone], email)){
       return false;
     }
 
@@ -209,8 +213,10 @@ $(document).ready(function() {
       var doctorData = {        
         fname: fname,
         lname: lname,
+        title: title,
         specialization: specialization,
         address: address, 
+        locality: locality,
         city: city,
         zip: zip,
         country: country,
